@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <openssl/dsa.h>
+#include <openssl/engine.h>
+#include <string.h>
+
+int main() {
+    DSA *dsa = DSA_new();
+    if (!DSA_generate_parameters_ex(dsa, 1024, NULL, 0, NULL, NULL, NULL)) {
+        printf("Parameter generation failed.\n");
+        return 1;
+    }
+
+    if (!DSA_generate_key(dsa)) {
+        printf("Key generation failed.\n");
+        return 1;
+    }
+
+    // Message to sign
+    const char *message = "Hello, DSA!";
+    unsigned char hash[20]; // SHA1 hash size is 20 bytes
+    unsigned char sig[DSA_size(dsa)];
+    unsigned int sig_len;
+
+    // Hash the message (simple version, OpenSSL 1.1+ recommends SHA1 here for DSA)
+    SHA1((const unsigned char*)message, strlen(message), hash);
+
+    // Sign the message hash
+    if (!DSA_sign(0, hash, 20, sig, &sig_len, dsa)) {
+        printf("Signing failed.\n");
+        return 1;
+    }
+
+    printf("Message signed successfully.\n");
+
+    // Verify the signature
+    int verify = DSA_verify(0, hash, 20, sig, sig_len, dsa);
+    if (verify == 1) {
+        printf("Signature verified successfully.\n");
+    } else if (verify == 0) {
+        printf("Signature verification failed.\n");
+    } else {
+        printf("Error during verification.\n");
+    }
+
+    DSA_free(dsa);
+    return 0;
+}
