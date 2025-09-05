@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define TABLE_SIZE 10
+
+// Node structure for linked list (chain)
+typedef struct Node {
+    int key;
+    int value;
+    struct Node* next;
+} Node;
+
+// Hash table structure (array of Node pointers)
+Node* hashTable[TABLE_SIZE];
+
+// Hash function: simple modulo
+int hashFunction(int key) {
+    return key % TABLE_SIZE;
+}
+
+// Insert key-value pair
+void insert(int key, int value) {
+    int hashIndex = hashFunction(key);
+
+    // Create a new node
+    Node* newNode = (Node*) malloc(sizeof(Node));
+    newNode->key = key;
+    newNode->value = value;
+    newNode->next = NULL;
+
+    // Insert at beginning of chain
+    if (hashTable[hashIndex] == NULL) {
+        hashTable[hashIndex] = newNode;
+    } else {
+        // Collision: add to the front of linked list
+        newNode->next = hashTable[hashIndex];
+        hashTable[hashIndex] = newNode;
+    }
+    printf("Inserted key %d with value %d\n", key, value);
+}
+
+// Search for a key in the hash table
+int search(int key) {
+    int hashIndex = hashFunction(key);
+    Node* temp = hashTable[hashIndex];
+
+    while (temp != NULL) {
+        if (temp->key == key) {
+            return temp->value;
+        }
+        temp = temp->next;
+    }
+    return -1; // Not found
+}
+
+// Display hash table contents
+void display() {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        printf("[%d]: ", i);
+        Node* temp = hashTable[i];
+        while (temp != NULL) {
+            printf("(%d,%d) -> ", temp->key, temp->value);
+            temp = temp->next;
+        }
+        printf("NULL\n");
+    }
+}
+
+int main() {
+    // Initialize hash table
+    for (int i = 0; i < TABLE_SIZE; i++)
+        hashTable[i] = NULL;
+
+    insert(1, 10);
+    insert(11, 20); // Collides with key=1
+    insert(21, 30); // Collides with key=1 and 11
+    insert(2, 40);
+
+    display();
+
+    int key = 11;
+    int val = search(key);
+    if (val != -1) {
+        printf("Value found for key %d: %d\n", key, val);
+    } else {
+        printf("Key %d not found\n", key);
+    }
+
+    return 0;
+}
