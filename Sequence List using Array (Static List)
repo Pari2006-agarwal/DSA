@@ -1,0 +1,52 @@
+#include <stdio.h>
+#define SIZE 100
+
+void display(int arr[], int n) {
+    printf("Sequence: ");
+    for (int i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+    printf("\n");
+}
+
+void insertAtEnd(int arr[], int *n, int value) {
+    if (*n >= SIZE) {
+        printf("List is full.\n");
+        return;
+    }
+    arr[*n] = value;
+    (*n)++;
+}
+
+void deleteByValue(int arr[], int *n, int value) {
+    int i, found = 0;
+    for (i = 0; i < *n; i++) {
+        if (arr[i] == value) {
+            found = 1;
+            break;
+        }
+    }
+    if (!found) {
+        printf("Value not found.\n");
+        return;
+    }
+    for (int j = i; j < *n - 1; j++) {
+        arr[j] = arr[j + 1];
+    }
+    (*n)--;
+}
+
+int main() {
+    int arr[SIZE];
+    int n = 0;
+
+    insertAtEnd(arr, &n, 10);
+    insertAtEnd(arr, &n, 20);
+    insertAtEnd(arr, &n, 30);
+
+    display(arr, n);
+
+    deleteByValue(arr, &n, 20);
+    display(arr, n);
+
+    return 0;
+}
