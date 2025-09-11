@@ -1,0 +1,92 @@
+#include <stdio.h>
+
+#define MAX 100
+
+typedef struct {
+    int data;
+    int priority;
+} Node;
+
+Node heap[MAX];
+int size = 0;
+
+// Swap function
+void swap(int i, int j) {
+    Node temp = heap[i];
+    heap[i] = heap[j];
+    heap[j] = temp;
+}
+
+// Heapify Up (for insert)
+void heapifyUp(int i) {
+    while (i > 0 && heap[i].priority < heap[(i - 1) / 2].priority) {
+        swap(i, (i - 1) / 2);
+        i = (i - 1) / 2;
+    }
+}
+
+// Heapify Down (for delete)
+void heapifyDown(int i) {
+    int left = 2*i + 1;
+    int right = 2*i + 2;
+    int smallest = i;
+
+    if (left < size && heap[left].priority < heap[smallest].priority)
+        smallest = left;
+    if (right < size && heap[right].priority < heap[smallest].priority)
+        smallest = right;
+
+    if (smallest != i) {
+        swap(i, smallest);
+        heapifyDown(smallest);
+    }
+}
+
+// Insert element into priority queue
+void enqueue(int data, int priority) {
+    if (size >= MAX) {
+        printf("Priority Queue is full!\n");
+        return;
+    }
+
+    heap[size].data = data;
+    heap[size].priority = priority;
+    heapifyUp(size);
+    size++;
+}
+
+// Remove element with highest priority (lowest number)
+int dequeue() {
+    if (size <= 0) {
+        printf("Priority Queue is empty!\n");
+        return -1;
+    }
+
+    int data = heap[0].data;
+    heap[0] = heap[size - 1];
+    size--;
+    heapifyDown(0);
+    return data;
+}
+
+// Display elements in the heap (not sorted order)
+void display() {
+    printf("Priority Queue (heap array):\n");
+    for (int i = 0; i < size; i++) {
+        printf("Data: %d | Priority: %d\n", heap[i].data, heap[i].priority);
+    }
+}
+
+int main() {
+    enqueue(10, 3);
+    enqueue(20, 1);
+    enqueue(30, 2);
+
+    display();
+
+    printf("\nDequeued: %d\n", dequeue());
+
+    display();
+
+    return 0;
+}
